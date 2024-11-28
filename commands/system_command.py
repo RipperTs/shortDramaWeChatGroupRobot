@@ -29,39 +29,17 @@ class SystemCommand:
                 return match.group(0)
             return ""
 
-        def extract_douyin_vid(url: str) -> str:
-            # 如果 URL 包含 "vid=" 参数
-            if "vid=" in url:
-                return url.split("vid=")[1].split("&")[0]
-            # 如果包含 video/ 格式 (支持 douyin.com 和 iesdouyin.com)
-            elif "/video/" in url:
-                # 提取 video/ 后的数字部分，直到下一个 / 或 ? 或字符串结束
-                vid = url.split("/video/")[1].split("/")[0].split("?")[0]
-                return vid
-            return ""
-
         try:
             url = extract_douyin_url_regex(video_url)
-            if 'v.douyin.com' in url:
-                response = requests.get(url, allow_redirects=False)
-                url = response.headers['Location']  # 获取跳转地址
-            vid = extract_douyin_vid(url)
-            request_url = f"https://api.tikhub.io/api/v1/douyin/web/fetch_one_video_v2?aweme_id={vid}"
-            response = requests.get(request_url, headers={
-                'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-                'Authorization': f'Bearer {TIKHUB_API_TOKEN}'
-            }, timeout=30)
+            response = requests.get(f'https://videoapi.funjs.top/api/parseUrl/query?url={url}&platform=utools',
+                                    headers={
+                                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) uTools/5.2.1 Chrome/108.0.5359.215 Electron/22.3.27 Safari/537.36'
+                                    })
+            if response.status_code != 200:
+                return "视频解析失败."
 
-            if response.json().get('code', 0) != 200:
-                print(f"请求失败：{response.text}")
-                return []
-
-            aweme_details = response.json().get('data', {}).get('aweme_details', [])
-            if len(aweme_details) == 0:
-                return "视频请求失败"
-
-            url_list = aweme_details[0].get('video', {}).get('play_addr', {}).get('url_list', [])
-            return url_list[len(url_list) - 1]
+            downurl = response.json().get('data', {}).get('downurl', '视频解析失败')
+            return downurl
         except:
             return "视频处理失败"
 
@@ -145,39 +123,11 @@ class SystemCommand:
         except Exception as e:
             return f"获取详情失败: {str(e)}"
 
-    def dy_report(self, ctx: CommandContext):
-        """
-        抖音自动举报作品
-        :param ctx:
-        :return:
-        """
-        request_url = f"https://api.tikhub.io/api/v1/douyin/app/v1/fetch_user_post_videos?sec_user_id={ctx.content}"
-        response = requests.get(request_url, headers={
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-            'Authorization': f'Bearer {TIKHUB_API_TOKEN}'
-        }, timeout=30)
-
-        if response.json().get('code', 0) != 200:
-            print(f"请求失败：{response.text}")
-            return []
-
-        aweme_list = response.json().get('data', {}).get('aweme_list', [])
-
-        content = ""
-        for item in aweme_list:
-            desc = item.get('desc', '')[:30] + '...'
-            aweme_id = item.get('aweme_id', '')
-            digg_count = item.get('statistics', {}).get('digg_count', 0)
-            content += f"作品ID: {aweme_id}, 点赞数: {digg_count}, 描述: {desc}\n\n"
-
-        content += f"共找到{len(aweme_list)}条作品，正在举报中，请稍后"
-        return content
-
 
 if __name__ == '__main__':
     service = SystemCommand()
-    print(service.dy_report(CommandContext(
-        content="MS4wLjABAAAA8OjD6qEuLpusPdYmfELKY4iWMNCw5rjnAv6aiBjXi7U",
+    print(service.video_parse(CommandContext(
+        content="3.89 复制打开抖音，看看【小刘不是程序员的作品】小米14换上澎湃OS2，老安卓用户的春天来了吗？ ... https://v.douyin.com/iDyr9ug6/ o@d.nD 09/28 aAT:/ ",
         talker_wxid='',
         sender_wxid=''
     )))
