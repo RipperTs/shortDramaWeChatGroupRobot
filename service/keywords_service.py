@@ -1,12 +1,12 @@
 import logging
 import queue
 import threading
+from collections import defaultdict
 
 from commands import register_commands
-from dao.robot_room_dao import RobotRoomDao
 from dto.command_dto import Command, CommandContext
 from service.wxbot_service import WxbotService
-from typing import Callable, Tuple, List, Optional
+from typing import Callable, Tuple, List, Optional, Dict
 from functools import wraps
 
 # 配置日志
@@ -55,26 +55,30 @@ class KeywordService:
     def __init__(self):
         self.current_topic = None
         self._lock = threading.Lock()  # 添加锁
-        self.command_queue = queue.Queue()  # 添加命令队列
+        self.command_queues: Dict[str, queue.Queue] = defaultdict(queue.Queue)
+        self.command_processors: Dict[str, threading.Thread] = {}
         if not self._registry:
             self._register_commands()
 
-        # 启动命令处理线程
-        self._start_command_processor()
+    def _get_or_create_processor(self, room_wxid: str):
+        """
+        获取或微信群消息的命令处理器
+        """
+        if room_wxid not in self.command_processors:
+            def processor():
+                while True:
+                    try:
+                        ctx = self.command_queues[room_wxid].get()
+                        self._process_command(ctx)
+                    except Exception as e:
+                        logger.error(f"Command processor error for room {room_wxid}: {str(e)}")
+                    finally:
+                        self.command_queues[room_wxid].task_done()
 
-    def _start_command_processor(self):
-        def processor():
-            while True:
-                try:
-                    ctx = self.command_queue.get()
-                    self._process_command(ctx)
-                except Exception as e:
-                    logger.error(f"Command processor error: {str(e)}")
-                finally:
-                    self.command_queue.task_done()
+            thread = threading.Thread(target=processor, daemon=True)
+            thread.start()
+            self.command_processors[room_wxid] = thread
 
-        thread = threading.Thread(target=processor, daemon=True)
-        thread.start()
 
     @timeout_handler(60)
     def _process_command(self, ctx: CommandContext):
@@ -99,16 +103,20 @@ class KeywordService:
                 logger.error(error_msg)
                 wxbot_service.send_text_msg(ctx.talker_wxid, error_msg, ctx.sender_wxid)
 
+
     def trigger_keywords(self, ctx: CommandContext):
         """
         触发关键词, 并进入队列处理命令
         :return:
         """
         try:
-            self.command_queue.put(ctx)
+            room_wxid = ctx.talker_wxid
+            self._get_or_create_processor(room_wxid)
+            self.command_queues[room_wxid].put(ctx)
         except Exception as e:
-            logger.error(f"Error queueing command: {str(e)}")
+            logger.error(f"Error queueing command for room {ctx.talker_wxid}: {str(e)}")
             wxbot_service.send_text_msg(ctx.talker_wxid, "系统繁忙,请稍后重试", ctx.sender_wxid)
+
 
     @classmethod
     def command(cls, *prefixes: str, require_content: bool = True, description: str = ""):
@@ -245,20 +253,3 @@ class KeywordService:
             logger.error(f"Error processing message: {str(e)}")
             return f"处理命令时出错: {str(e)}"
 
-
-if __name__ == '__main__':
-    service = KeywordService()
-    ctx = CommandContext(
-        content='同步喜乐短剧',
-        talker_wxid='52964830236@chatroom',
-        sender_wxid='F1061166944',
-    )
-    service.trigger_keywords(ctx)
-
-    # 等待队列处理完成
-    service.command_queue.join()
-
-    # 或添加一个小的延时确保消息被处理
-    import time
-
-    time.sleep(2)
