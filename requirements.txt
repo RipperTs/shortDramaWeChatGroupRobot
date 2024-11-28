@@ -1,0 +1,12 @@
+requests
+schedule
+flask
+sqlalchemy
+pymysql
+pydantic
+cryptography
+lxml
+matplotlib
+openai
+python-dotenv
+diskcache
