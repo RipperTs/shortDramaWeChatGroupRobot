@@ -94,6 +94,9 @@ curl --location --request POST 'http://127.0.0.1:8080/api/sync-url' \
 }'
 ```
 
+### 配置文件
+[.env.example](.env.example) 文件中包含了所有配置项, 请将其复制一份并命名为 `.env` 并修改其中的配置项。
+
 ### 如何定时通知
 
 每间隔 x 分钟自行运行 [data_acquisition.py](data_acquisition.py) 此脚本即可, 可以将其添加到 crontab 中。   
