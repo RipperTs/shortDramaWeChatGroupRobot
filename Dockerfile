@@ -11,11 +11,6 @@ RUN apt-get update && \
 # 设置环境变量
 ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-# 安装必要的系统依赖
-RUN apt-get update && apt-get install -y \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
-
 # 升级pip到最新版本
 RUN pip install --no-cache-dir --upgrade pip
 
