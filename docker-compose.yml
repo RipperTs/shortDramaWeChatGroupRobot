@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  poe:
+    container_name: dydj-wxbot
+    image: registry.cn-hangzhou.aliyuncs.com/ripper/dydj-wxbot:latest
+    restart: always
+    ports:
+      - 12300:12300
+    environment:
+      - DB_USER=your_database_user
+      - DB_PASSWORD=your_database_password
+      - DB_HOST=your_database_host
+      - DB_NAME=your_database_name
+      - OPENAI_API_KEY=your_openai_api_key
+      - OPENAI_BASE_URL=your_openai_base_url
+      - MESSAGE_GROUP=wxid1,wxid2@chatroom
+      - SUPER_ADMIN=wxid1,wxid2
+      - TIKHUB_API_TOKEN=your_tikhub_api_token
+      - WXBOT_URL=http://127.0.0.1:8080
+      - FEISHU_APPID=
+      - FEISHU_APP_SECRET=
