@@ -42,3 +42,4 @@ build
 dist
 __pycache__
 cache
+docker-compose-local.yml
