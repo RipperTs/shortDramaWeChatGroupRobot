@@ -85,10 +85,30 @@ class RobotRoomDao:
 
     @staticmethod
     def update_min_heat(wxid: str, min_heat: int) -> RobotRoom:
+        """
+        更新最低热度
+        :param wxid:
+        :param min_heat:
+        :return:
+        """
         with db_session() as session:
             result = session.query(RobotRoom).filter(RobotRoom.room_wxid == wxid).first()
             if result:
                 result.below_standard = min_heat
+            return result
+
+    @staticmethod
+    def update_sync_time(wxid: str, timed: int) -> RobotRoom:
+        """
+        更新同步间隔时间
+        :param wxid:
+        :param timed:
+        :return:
+        """
+        with db_session() as session:
+            result = session.query(RobotRoom).filter(RobotRoom.room_wxid == wxid).first()
+            if result:
+                result.notification_interval = timed
             return result
 
 

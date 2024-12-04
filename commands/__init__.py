@@ -126,6 +126,12 @@ def register_commands():
             is_admin=True
         ),
         Command(
+            prefixes=("设置同步间隔",),
+            handler=room_command.set_sync_time,
+            description="话题同步间隔时间(分钟)",
+            is_admin=True
+        ),
+        Command(
             prefixes=("设置最小热度值",),
             handler=room_command.set_min_heat,
             description="设置通知最小热度值, 大于此值才会通知",

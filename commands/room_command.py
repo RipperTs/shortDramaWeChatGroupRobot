@@ -103,7 +103,6 @@ class RoomCommand:
 
         return "设置失败."
 
-
     def enable_robot(self, ctx: CommandContext):
         """
         启用机器人
@@ -124,7 +123,6 @@ class RoomCommand:
             return "操作失败."
 
         return "启用成功."
-
 
     def disable_robot(self, ctx: CommandContext):
         """
@@ -147,7 +145,6 @@ class RoomCommand:
 
         return "禁用成功."
 
-
     def set_min_heat(self, ctx: CommandContext):
         """
         设置最小热度
@@ -160,6 +157,27 @@ class RoomCommand:
             return "权限不足."
 
         result = RobotRoomDao.update_min_heat(ctx.talker_wxid, int(ctx.content))
+        if not result:
+            return "操作失败."
+
+        return "设置成功."
+
+    def set_sync_time(self, ctx: CommandContext):
+        """
+        设置同步时间
+        :param ctx:
+        :return:
+        """
+        robot_room_setting = RobotRoomSettingDao.get_by_wxid(ctx.talker_wxid)
+        if ctx.sender_wxid not in self.super_admin and ctx.sender_wxid not in [setting.admin_wxid for setting in
+                                                                               robot_room_setting]:
+            return "权限不足."
+
+        timed = int(ctx.content)
+        if timed < 10:
+            return "时间间隔不能小于10分钟"
+
+        result = RobotRoomDao.update_sync_time(ctx.talker_wxid, timed)
         if not result:
             return "操作失败."
 
