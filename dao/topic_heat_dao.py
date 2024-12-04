@@ -84,7 +84,7 @@ class TopicHeatDao:
                     )
                 ORDER BY t1.created_at DESC
                 """
-            result = session.execute(text(sql), {'keyword': keyword, 'limit': limit})
+            result = session.execute(text(sql), {'keyword': keyword, 'limit': limit, 'room_wxid': room_wxid})
             return [(row[0], row[1]) for row in result]
 
     @staticmethod
@@ -124,5 +124,5 @@ class TopicHeatDao:
 
 if __name__ == '__main__':
     model = TopicHeatDao()
-    for item in model.get_heat_notify_list('52964830236@chatroom'):
+    for item in model.get_heat_diffs('52964830236@chatroom', '无声秘恋'):
         print(item)
