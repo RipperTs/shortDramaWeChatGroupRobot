@@ -4,6 +4,8 @@ import binascii
 import requests
 import re
 from diskcache import Cache
+from urllib.parse import quote
+from lxml import html
 
 from config import AIPANSO_CODE
 
@@ -123,6 +125,56 @@ class AiPanSoService:
         return f"ck_ml_sea_={hex_output}"
 
 
+    def get_search_result(self, keyword):
+        encoded_keyword = quote(keyword)
+        url = f"https://www.aipanso.com/search?k={encoded_keyword}"
+
+        # 根据参数获取 cookie 的值 (有效期 10 分钟)
+        first_start_load_value = self.get_first_start_load_value("GET", url, None)
+        if first_start_load_value is None:
+            raise Exception("网站获取参数, 无法获取网盘地址")
+
+        cookie_value = self.start_load(first_start_load_value)
+        self.global_headers['Cookie'] = cookie_value
+
+        def parse_data(html_content):
+            """
+            解析 html
+            :param html_content:
+            :return:
+            """
+            try:
+                tree = html.fromstring(html_content)
+
+                # Get all the van-row elements containing links and titles
+                rows = tree.xpath('//van-row[.//van-card]')
+
+                results = []
+                for row in rows:
+                    try:
+                        # Extract link
+                        link = row.xpath('.//a/@href')[0]
+
+                        # Extract full title (combining all text within the title div)
+                        title = ''.join(
+                            row.xpath('.//div[@style="font-size:medium;font-weight: 550;padding-top: 5px;"]//text()')).strip()
+
+                        results.append({
+                            'link': link,
+                            'title': title
+                        })
+                    except:
+                        continue
+
+                return results
+            except Exception as e:
+                print(f"解析数据失败: {e}")
+                return []
+
+        response = requests.request("GET", url, headers=self.global_headers, timeout=30)
+        return parse_data(response.text)
+
+
 if __name__ == '__main__':
     ai_service = AiPanSoService()
-    print(ai_service.get_pan_url("z5g0LI1Beh0oVZZsepcbsU7b"))
+    print(ai_service.get_search_result("无声秘恋"))
