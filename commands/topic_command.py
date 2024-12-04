@@ -214,7 +214,7 @@ class TopicCommand:
         if topic.status == 0:
             return "话题已被禁用"
 
-        trends_data = TopicHeatDao.get_heat_diffs(topic.keyword, 250)
+        trends_data = TopicHeatDao.get_heat_diffs(ctx.talker_wxid, topic.keyword, 250)
         if len(trends_data) == 0:
             return "暂无趋势数据"
         try:
