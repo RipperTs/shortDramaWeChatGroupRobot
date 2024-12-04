@@ -26,10 +26,10 @@ def getWebTopicList(keyword):
         return json.loads(cache_data)
 
     encoded_keyword = quote(keyword)
-    url = f"https://creator.douyin.com/aweme/v1/search/challengesug/?source=challenge_create&aid=2906&keyword={encoded_keyword}&cookie_enabled=true&screen_width=2560&screen_height=1440&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Mozilla&browser_version=5.0+%28Macintosh%3B+Intel+Mac+OS+X+10_15_7%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Chrome%2F130.0.0.0+Safari%2F537.36&browser_online=true&timezone_name=Asia%2FShanghai"
+    url = f"http://10.6.80.35:14566/aweme/v1/search/challengesug/?source=challenge_create&aid=2906&keyword={encoded_keyword}&cookie_enabled=true&screen_width=2560&screen_height=1440&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Mozilla&browser_version=5.0+%28Macintosh%3B+Intel+Mac+OS+X+10_15_7%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Chrome%2F130.0.0.0+Safari%2F537.36&browser_online=true&timezone_name=Asia%2FShanghai"
     response = requests.get(url, headers={
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
-    }, timeout=30, verify=False)
+    }, timeout=30)
 
     try:
         result_json = json.loads(response.text)
@@ -93,3 +93,4 @@ def parse_view_count(keyword, topic_list):
         return 0
     except:
         return 0
+
