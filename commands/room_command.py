@@ -56,6 +56,7 @@ class RoomCommand:
         if not result:
             return "操作失败."
 
+        TopicTaskScheduled.refresh_room_task(ctx.talker_wxid)
         return "授权成功."
 
     def update_expire_time(self, ctx: CommandContext):
@@ -123,6 +124,7 @@ class RoomCommand:
         if not result:
             return "操作失败."
 
+        TopicTaskScheduled.refresh_room_task(ctx.talker_wxid)
         return "启用成功."
 
     def disable_robot(self, ctx: CommandContext):
@@ -144,6 +146,7 @@ class RoomCommand:
         if not result:
             return "操作失败."
 
+        TopicTaskScheduled.del_room_task(ctx.talker_wxid)
         return "禁用成功."
 
     def set_min_heat(self, ctx: CommandContext):

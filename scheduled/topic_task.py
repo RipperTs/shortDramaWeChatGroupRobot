@@ -85,6 +85,7 @@ class TopicTaskScheduled:
         :param room_wxid:
         :return:
         """
+
         def is_between_midnight_and_six():
             """
             判断当前时间是否在凌晨0点到7点之间
@@ -96,8 +97,11 @@ class TopicTaskScheduled:
         if is_between_midnight_and_six():
             return
 
-        saveTopicHeat(room_wxid)
+        room_info = RobotRoomDao.get_by_room_wxid(room_wxid)
+        if not room_info:
+            return False
 
+        saveTopicHeat(room_wxid)
 
     @staticmethod
     def refresh_room_task(room_wxid):
@@ -129,3 +133,17 @@ class TopicTaskScheduled:
         except Exception as e:
             logger.error(f"刷新任务失败: {e}")
             return False
+
+
+    @staticmethod
+    def del_room_task(room_wxid):
+        """
+        删除现有任务
+        :param room_wxid:
+        :return:
+        """
+        job_id = f"room_{room_wxid}"
+        if scheduler.get_job(job_id):
+            scheduler.remove_job(job_id)
+
+        return True
