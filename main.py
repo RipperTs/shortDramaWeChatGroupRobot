@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+
+from scheduled.topic_task import TopicTaskScheduled
 from service.messages_service import MessageService
 
 app = Flask(__name__)
@@ -25,4 +27,7 @@ def handle_post():
 
 
 if __name__ == '__main__':
+    # 初始化定时任务
+    TopicTaskScheduled.init_tasks()
+    # 启动服务
     app.run(debug=False, host='0.0.0.0', port=12300)

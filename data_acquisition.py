@@ -1,4 +1,3 @@
-import datetime
 import json
 
 import requests
@@ -43,7 +42,11 @@ def getWebTopicList(keyword):
 
 
 def saveTopicHeat(room_wxid: str):
-    # 查询关键字列表
+    """
+    保存话题热度数据
+    :param room_wxid:
+    :return:
+    """
     topic = TopicKeywordDao.get_all(room_wxid)
     if len(topic) == 0:
         return None
@@ -91,25 +94,3 @@ def parse_view_count(keyword, topic_list):
     except:
         return 0
 
-
-def is_between_midnight_and_six():
-    """
-    判断当前时间是否在凌晨0点到7点之间
-    :return:
-    """
-    current_hour = datetime.datetime.now().hour
-    return 0 <= current_hour < 7
-
-
-if __name__ == '__main__':
-
-    if is_between_midnight_and_six():
-        exit()
-
-    robot_room_list = RobotRoomDao.get_room_list()
-    for robot_room in robot_room_list:
-        try:
-            saveTopicHeat(robot_room.room_wxid)
-        except Exception as e:
-            print(e)
-            continue
