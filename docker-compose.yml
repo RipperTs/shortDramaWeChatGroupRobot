@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  poe:
+  wxbot:
     container_name: dydj-wxbot
     image: registry.cn-hangzhou.aliyuncs.com/ripper/dydj-wxbot:latest
     restart: always
