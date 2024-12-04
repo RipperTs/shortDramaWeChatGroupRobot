@@ -3,6 +3,14 @@ FROM python:3.9-slim
 # 设置工作目录
 WORKDIR /app
 
+# 更新证书
+RUN apt-get update && \
+    apt-get install -y ca-certificates openssl && \
+    update-ca-certificates
+
+# 设置环境变量
+ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+
 # 安装必要的系统依赖
 RUN apt-get update && apt-get install -y \
     wget \

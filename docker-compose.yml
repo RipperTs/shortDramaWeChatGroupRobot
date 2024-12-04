@@ -19,3 +19,5 @@ services:
       - WXBOT_URL=http://127.0.0.1:8080
       - FEISHU_APPID=
       - FEISHU_APP_SECRET=
+    volumes:
+      - ./cache:/app/cache   # 将缓存目录挂载到宿主机
