@@ -1,3 +1,5 @@
+import time
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 import binascii
@@ -51,6 +53,7 @@ class AiPanSoService:
         url = "https://www.aipanso.com/active"
         payload = f'code={code}'
 
+        self.global_headers['Cookie'] = ''
         # 根据参数获取 cookie 的值 (有效期 10 分钟)
         first_start_load_value = self.get_first_start_load_value("POST", url, payload)
         if first_start_load_value is None:
@@ -97,6 +100,9 @@ class AiPanSoService:
 
         cookie_value = self.start_load(first_start_load_value)
         self.global_headers['Cookie'] = cookie + cookie_value
+        self.global_headers['Referer'] = url
+        self.global_headers[
+            'Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
 
         # 获取最终网盘地址
         response = requests.request("GET", url, headers=self.global_headers, timeout=30, allow_redirects=True)
@@ -123,7 +129,6 @@ class AiPanSoService:
         hex_output = binascii.hexlify(encrypted).decode()
 
         return f"ck_ml_sea_={hex_output}"
-
 
     def get_search_result(self, keyword):
         encoded_keyword = quote(keyword)
@@ -157,7 +162,8 @@ class AiPanSoService:
 
                         # Extract full title (combining all text within the title div)
                         title = ''.join(
-                            row.xpath('.//div[@style="font-size:medium;font-weight: 550;padding-top: 5px;"]//text()')).strip()
+                            row.xpath(
+                                './/div[@style="font-size:medium;font-weight: 550;padding-top: 5px;"]//text()')).strip()
 
                         results.append({
                             'link': link,
@@ -174,7 +180,33 @@ class AiPanSoService:
         response = requests.request("GET", url, headers=self.global_headers, timeout=30)
         return parse_data(response.text)
 
+    def search_dj(self, keyword):
+        """
+        搜索短剧
+        :param keyword:
+        :return:
+        """
+        result_list = self.get_search_result(keyword)
+        content = ""
+        for i, item in enumerate(result_list, 1):
+            try:
+                if i > 2:
+                    break
+                fid = item['link'][3:]
+                pan_url = self.get_pan_url(fid)
+                if pan_url is None:
+                    content += f"{i}、{item['title']} - 获取网盘地址失败\n\n"
+                else:
+                    content += f"{i}、{item['title']} - {pan_url}\n\n"
+
+            except Exception as e:
+                print(f"爱搜盘数据获取失败: {e}")
+            finally:
+                time.sleep(0.5)
+
+        return content
+
 
 if __name__ == '__main__':
     ai_service = AiPanSoService()
-    print(ai_service.get_search_result("无声秘恋"))
+    print(ai_service.search_dj("无声秘恋"))

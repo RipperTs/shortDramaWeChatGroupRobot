@@ -5,13 +5,16 @@ from urllib.parse import quote
 from lxml import etree
 
 from dto.command_dto import CommandContext
-from config import TIKHUB_API_TOKEN
+from service.aipanso_service import AiPanSoService
 
 
 class SystemCommand:
     """
     系统级别命令
     """
+
+    def __init__(self):
+        self.aipanso_service = AiPanSoService()
 
     def video_parse(self, ctx: CommandContext):
         """
@@ -84,7 +87,11 @@ class SystemCommand:
                 time.sleep(0.5)
 
         if content == "":
-            return "未找到相关短剧"
+            # 接入爱盘搜数据源
+            content = self.aipanso_service.search_dj(ctx.content)
+            if content == "":
+                return "未找到相关短剧"
+
         return content
 
     def search_dj_detail(self, url):
@@ -126,8 +133,8 @@ class SystemCommand:
 
 if __name__ == '__main__':
     service = SystemCommand()
-    print(service.video_parse(CommandContext(
-        content="3.89 复制打开抖音，看看【小刘不是程序员的作品】小米14换上澎湃OS2，老安卓用户的春天来了吗？ ... https://v.douyin.com/iDyr9ug6/ o@d.nD 09/28 aAT:/ ",
+    print(service.search_dj(CommandContext(
+        content="无声秘恋",
         talker_wxid='',
         sender_wxid=''
     )))
