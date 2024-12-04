@@ -178,8 +178,8 @@ class RoomCommand:
             return "权限不足."
 
         timed = int(ctx.content)
-        if timed < 10:
-            return "时间间隔不能小于10分钟"
+        if timed < 1:
+            return "时间间隔不能小于1分钟"
 
         result = RobotRoomDao.update_sync_time(ctx.talker_wxid, timed)
         if not result:
