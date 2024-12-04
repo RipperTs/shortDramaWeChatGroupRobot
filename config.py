@@ -30,3 +30,5 @@ FEISHU_APP_SECRET = os.getenv('FEISHU_APP_SECRET')
 
 # 超级管理员wxid
 SUPER_ADMIN = os.getenv('SUPER_ADMIN').split(',')
+
+DY_TOPIC_URL = os.getenv('DY_TOPIC_URL', 'https://creator.douyin.com')

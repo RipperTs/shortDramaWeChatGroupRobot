@@ -17,6 +17,7 @@ services:
       - SUPER_ADMIN=wxid1,wxid2
       - TIKHUB_API_TOKEN=your_tikhub_api_token
       - WXBOT_URL=http://127.0.0.1:8080
+      - DY_TOPIC_URL=https://creator.douyin.com
       - FEISHU_APPID=
       - FEISHU_APP_SECRET=
     volumes:
