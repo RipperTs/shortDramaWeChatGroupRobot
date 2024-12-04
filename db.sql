@@ -55,6 +55,7 @@ CREATE TABLE `topic_heats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `keyword` varchar(50) DEFAULT '' COMMENT '关键字',
   `heat` bigint(20) DEFAULT '0' COMMENT '热度',
+  `room_wxid`  varchar(50) default '' null comment '群 ID',
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `topic_heats_keyword_index` (`keyword`)
