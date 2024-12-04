@@ -57,6 +57,20 @@ class FeiShuCommand:
 
     def _process_topic_data(self, room_wxid: str) -> SyncResult:
         result = SyncResult()
+
+        def parse_datetime(date_str):
+            """
+            解析兼容不同的时间格式
+            :param date_str:
+            :return:
+            """
+            for fmt in ['%Y/%m/%d %H:%M:%S', '%Y/%m/%d %H:%M']:
+                try:
+                    return datetime.strptime(date_str, fmt)
+                except ValueError:
+                    continue
+            raise ValueError(f"不支持的时间格式: {date_str}")
+
         try:
             table_data = self.feishu_service.get_spreadsheets_values()
             values = table_data.get('data', {}).get('valueRange', {}).get('values', [])
@@ -68,7 +82,7 @@ class FeiShuCommand:
                         continue
 
                     topic_data = self._extract_topic_data(item)
-                    shelf_datetime = datetime.strptime(topic_data['shelf_time'], '%Y/%m/%d %H:%M')
+                    shelf_datetime = parse_datetime(topic_data['shelf_time'])
 
                     if shelf_datetime.date() != today:
                         continue
