@@ -2,7 +2,11 @@ from flask import Flask, request, jsonify
 
 from scheduled.topic_task import TopicTaskScheduled
 from service.messages_service import MessageService
+import os
+import time
 
+os.environ['TZ'] = 'Asia/Shanghai'
+time.tzset()
 app = Flask(__name__)
 wxbot_service = MessageService()
 
