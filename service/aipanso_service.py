@@ -195,7 +195,7 @@ class AiPanSoService:
                 fid = item['link'][3:]
                 pan_url = self.get_pan_url(fid)
                 if pan_url is None:
-                    content += f"{i}、{item['title']} - 获取网盘地址失败\n\n"
+                    content += f"{i}、{item['title']} - https://www.aipanso.com/{item['link']}\n\n"
                 else:
                     content += f"{i}、{item['title']} - {pan_url}\n\n"
 
