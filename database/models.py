@@ -12,7 +12,8 @@ engine = create_engine(
     pool_timeout=60,  # 获取连接的超时时间
     pool_recycle=1800,  # 连接重用时间限制(30分钟)
     pool_pre_ping=True,  # 自动检测连接是否有效
-    poolclass=QueuePool
+    poolclass=QueuePool,
+    connect_args={'timezone': '+08:00'}  # 直接在连接参数中设置时区
 )
 
 # 创建会话工厂
