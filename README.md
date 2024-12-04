@@ -47,6 +47,23 @@
 
 ## 如何使用
 
+### Docker 部署 [推荐]
+> 在此之前请自行安装 MySQL 并导入 [db.sql](db.sql) 文件。
+
+将 [docker-compose.yml](docker-compose.yml) 文件下载到本地, 并修改其中的配置项, 然后执行以下命令即可。
+```shell
+docker-compose up -d
+````
+
+#### 如何更新?
+```shell
+# 拉取最新镜像
+docker-compose pull
+# 使用最新镜像
+docker-compose down
+docker-compose up -d
+```
+
 ### 环境
 - Python 3.9
 - MySQL 5.7
