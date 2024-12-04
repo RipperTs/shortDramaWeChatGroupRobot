@@ -103,7 +103,7 @@ class TopicHeatDao:
                         th.heat,
                         th.created_at
                     FROM topic_heats th
-                    INNER JOIN topic_keywords tk ON th.keyword = tk.keyword
+                    INNER JOIN topic_keywords tk ON th.keyword = tk.keyword AND th.room_wxid = tk.room_wxid
                     WHERE tk.status = 1
                     AND th.heat > 0
                     AND th.room_wxid = :room_wxid
@@ -124,5 +124,5 @@ class TopicHeatDao:
 
 if __name__ == '__main__':
     model = TopicHeatDao()
-    for item in model.get_heat_diffs('52964830236@chatroom', '无声秘恋'):
+    for item in model.get_heat_notify_list('52964830236@chatroom'):
         print(item)
