@@ -124,5 +124,5 @@ class TopicHeatDao:
 
 if __name__ == '__main__':
     model = TopicHeatDao()
-    for item in model.get_heat_notify_list('50153368810@chatroom'):
+    for item in model.get_heat_notify_list('52964830236@chatroom'):
         print(item)

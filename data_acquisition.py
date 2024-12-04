@@ -94,3 +94,6 @@ def parse_view_count(keyword, topic_list):
     except:
         return 0
 
+
+if __name__ == '__main__':
+    saveTopicHeat('52964830236@chatroom')
