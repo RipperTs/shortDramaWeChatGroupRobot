@@ -10,21 +10,24 @@ from dto.topic_heat_dto import TopicNotifyResult
 
 class TopicHeatDao:
     @staticmethod
-    def create(keyword: str, heat: int):
+    def create(keyword: str, heat: int, room_wxid: str):
+        """
+        创建话题热度
+        :param keyword:
+        :param heat:
+        :param room_wxid:
+        :return:
+        """
         with db_session() as session:
-            topic = TopicHeat(keyword=keyword, heat=heat, created_at=datetime.now())
+            topic = TopicHeat(keyword=keyword, heat=heat, room_wxid=room_wxid, created_at=datetime.now())
             session.add(topic)
             return topic
 
     @staticmethod
     def get(id: int):
         with db_session() as session:
+            session.expunge_all()
             return session.query(TopicHeat).get(id)
-
-    @staticmethod
-    def get_by_keyword(keyword: str):
-        with db_session() as session:
-            return session.query(TopicHeat).filter(TopicHeat.keyword.like(f"%{keyword}%")).all()
 
     @staticmethod
     def update(id: int, keyword: str = None, heat: int = None):
@@ -47,9 +50,10 @@ class TopicHeatDao:
             return False
 
     @staticmethod
-    def get_heat_diffs(keyword: str, limit: int = 50) -> List[Tuple[datetime, int]]:
+    def get_heat_diffs(room_wxid: str, keyword: str, limit: int = 50) -> List[Tuple[datetime, int]]:
         """
         获取热度差值
+        :param room_wxid:
         :param keyword:
         :param limit:
         :return:
@@ -63,6 +67,7 @@ class TopicHeatDao:
                     FROM topic_heats
                     WHERE keyword = :keyword
                         AND heat > 0
+                        AND room_wxid = :room_wxid
                     ORDER BY created_at DESC
                     LIMIT :limit
                 ) t1
@@ -73,6 +78,7 @@ class TopicHeatDao:
                         WHERE t3.keyword = t1.keyword
                             AND t3.created_at < t1.created_at
                             AND heat > 0
+                            AND room_wxid = :room_wxid
                         ORDER BY created_at DESC
                         LIMIT 1
                     )
@@ -82,7 +88,7 @@ class TopicHeatDao:
             return [(row[0], row[1]) for row in result]
 
     @staticmethod
-    def get_heat_notify_list(room_wxid) -> List[TopicNotifyResult]:
+    def get_heat_notify_list(room_wxid: str) -> List[TopicNotifyResult]:
         """
         获取话题热度通知列表
         :param room_wxid:
@@ -97,15 +103,17 @@ class TopicHeatDao:
                         th.heat,
                         th.created_at
                     FROM topic_heats th
-                    INNER JOIN topic_keywords tk ON th.keyword = tk.keyword AND tk.room_wxid = :room_wxid
+                    INNER JOIN topic_keywords tk ON th.keyword = tk.keyword
                     WHERE tk.status = 1
                     AND th.heat > 0
+                    AND th.room_wxid = :room_wxid
                     AND (
                         SELECT COUNT(*)
                         FROM topic_heats th2
                         WHERE th2.keyword = th.keyword
                         AND th2.created_at >= th.created_at
                         AND th2.heat > 0
+                        AND th.room_wxid = :room_wxid
                     ) <= 2
                     ORDER BY th.keyword, th.created_at DESC
                 """

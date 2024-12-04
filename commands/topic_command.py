@@ -127,7 +127,7 @@ class TopicCommand:
         :return:
         """
         topic = TopicKeywordDao.get_by_keyword(ctx.content, ctx.talker_wxid)
-        view_count = self.search_and_create_topic(ctx.content)
+        view_count = self.search_and_create_topic(ctx.content, ctx.talker_wxid)
         if topic:
             self.enable_topic(CommandContext(
                 content=str(topic.id)
@@ -397,7 +397,7 @@ class TopicCommand:
 
         return "\n".join(result) if result else "无效的话题ID列表"
 
-    def search_and_create_topic(self, content):
+    def search_and_create_topic(self, content, room_wxid: str):
         """
         搜索话题并创建记录
         :param content为要搜索的关键词
@@ -420,7 +420,8 @@ class TopicCommand:
         # 创建热度记录
         TopicHeatDao.create(
             keyword=content,
-            heat=view_count
+            heat=view_count,
+            room_wxid=room_wxid
         )
 
         return view_count

@@ -26,6 +26,7 @@ class TopicHeat(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     keyword = Column(String(50), default='')
     heat = Column(BigInteger, default=0)
+    room_wxid = Column(String(50), default='')
     created_at = Column(DateTime)
 
 

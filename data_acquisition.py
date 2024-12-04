@@ -59,7 +59,7 @@ def saveTopicHeat(room_wxid: str):
         topic_list = getWebTopicList(item.keyword)
         # 解析话题热度
         view_count = parse_view_count(item.keyword, topic_list)
-        TopicHeatDao.create(item.keyword, view_count)
+        TopicHeatDao.create(item.keyword, view_count, room_wxid)
         time.sleep(1)
 
     # 查询要通知的热度数据

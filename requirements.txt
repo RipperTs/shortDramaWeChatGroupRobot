@@ -10,3 +10,4 @@ matplotlib
 openai
 python-dotenv
 diskcache
+apscheduler
