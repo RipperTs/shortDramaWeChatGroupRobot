@@ -1,8 +1,12 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, BigInteger
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, BigInteger, event, types
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.pool import QueuePool
 from config import DATABASE_URL
+import pytz
+
+# 设置时区
+shanghai_tz = pytz.timezone('Asia/Shanghai')
 
 # 创建数据库引擎，添加连接池配置
 engine = create_engine(
@@ -21,6 +25,28 @@ Session = scoped_session(sessionmaker(bind=engine))
 Base = declarative_base()
 
 
+# 创建自定义的DateTime类型
+class TimezoneDateTime(types.TypeDecorator):
+    impl = types.DateTime
+    cache_ok = True
+
+    def __init__(self):
+        super(TimezoneDateTime, self).__init__(timezone=True)
+        self.shanghai_tz = pytz.timezone('Asia/Shanghai')
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = self.shanghai_tz.localize(value)
+        return value.astimezone(self.shanghai_tz).replace(tzinfo=None)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return self.shanghai_tz.localize(value)
+
+
 class TopicHeat(Base):
     __tablename__ = "topic_heats"
 
@@ -28,7 +54,7 @@ class TopicHeat(Base):
     keyword = Column(String(50), default='')
     heat = Column(BigInteger, default=0)
     room_wxid = Column(String(50), default='')
-    created_at = Column(DateTime)
+    created_at = Column(TimezoneDateTime)
 
 
 class TopicKeyword(Base):
@@ -37,7 +63,7 @@ class TopicKeyword(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     keyword = Column(String(50), default='')
     status = Column(Integer, default=1)
-    shelf_time = Column(DateTime)
+    shelf_time = Column(TimezoneDateTime)
     xt_mcn = Column(String(50), default='')
     applet = Column(String(50), default='')
     theater = Column(String(50), default='')
@@ -57,7 +83,7 @@ class RobotRoom(Base):
     notification_interval = Column(Integer, default=10)
     status = Column(Integer, default=1)
     topic_max_num = Column(Integer, default=50)
-    expiration_time = Column(DateTime)
+    expiration_time = Column(TimezoneDateTime)
     below_standard = Column(Integer, default=30000)
 
 
