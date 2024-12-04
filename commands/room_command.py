@@ -6,6 +6,7 @@ from config import SUPER_ADMIN
 from dao.robot_room_dao import RobotRoomDao
 from dao.robot_room_setting_dao import RobotRoomSettingDao
 from dto.command_dto import CommandContext
+from scheduled.topic_task import TopicTaskScheduled
 from service.wxbot_service import WxbotService
 import base64
 import re
@@ -181,6 +182,7 @@ class RoomCommand:
         if not result:
             return "操作失败."
 
+        TopicTaskScheduled.refresh_room_task(ctx.talker_wxid)
         return "设置成功."
 
 
