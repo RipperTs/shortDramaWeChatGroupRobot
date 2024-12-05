@@ -1,11 +1,12 @@
-import time
+import threading
 import requests
 import re
-from urllib.parse import quote
-from lxml import etree
 
 from dto.command_dto import CommandContext
 from service.aipanso_service import AiPanSoService
+from service.wxbot_service import WxbotService
+from service.xingyun_service import XingYunService
+import time
 
 
 class SystemCommand:
@@ -15,6 +16,8 @@ class SystemCommand:
 
     def __init__(self):
         self.aipanso_service = AiPanSoService()
+        self.xingyun_service = XingYunService()
+        self.wxbot_service = WxbotService()
 
     def video_parse(self, ctx: CommandContext):
         """
@@ -52,89 +55,31 @@ class SystemCommand:
         :param ctx:
         :return:
         """
-        encoded_keyword = quote(ctx.content)
-        url = f"https://www.ssyhb.cn/search/{encoded_keyword}.html"
-        response = requests.get(url, headers={
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'}
-                                , timeout=30)
-        if response.status_code != 200:
-            return "目标站点访问失败"
 
-        html = etree.HTML(response.text)
-        liNodes = html.xpath("//ul[@class='list']/li")
+        def do_search_handler() -> None:
+            content = self.xingyun_service.search_dj(ctx.content)
+            if content == "" or content is None:
+                content = self.aipanso_service.search_dj(ctx.content)
 
-        content = ""
-        for i, item in enumerate(liNodes, 1):
-            if i > 5:
-                break
-            try:
-                # 获取每个li下的剧名
-                texts = item.xpath('.//a//text()')
-                text = ''.join(texts).replace('\r\n', '').strip()
-                drama_name = text.replace('免费在��观看', '')
-                # 获取每个li下的链接
-                link = item.xpath('.//h2/a/@href')
-                if drama_name and link:  # 确保非空再输出
-                    try:
-                        kkurl = self.search_dj_detail(link[0])
-                        content += f"{i}、{drama_name} {kkurl}\n\n"
-                    except Exception as e:
-                        content += f"{i}、获取详情失败: {str(e)}\n\n"
-            except Exception as e:
-                content += f"{i}、获取失败: {e}\n\n"
-                continue
-            finally:
-                time.sleep(0.5)
+            if content == "" or content is None:
+                content = "未搜索到相关短剧."
 
-        if content == "":
-            # 接入爱盘搜数据源
-            content = self.aipanso_service.search_dj(ctx.content)
-            if content == "":
-                return "未找到相关短剧"
+            # 发送消息
+            self.wxbot_service.send_text_msg(ctx.talker_wxid, content, ctx.sender_wxid)
 
-        return content
+        thread = threading.Thread(target=do_search_handler)
+        thread.daemon = True
+        thread.start()
 
-    def search_dj_detail(self, url):
-        try:
-            response = requests.get(url, headers={
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
-            }, timeout=30)
-
-            if response.status_code != 200:
-                return "目标站点访问失败"
-
-            html = etree.HTML(response.text)
-
-            # 尝试多个可能的xpath表达式
-            pan_link = None
-            xpath_patterns = [
-                '//p/strong//a/@href',
-                '//a[contains(text(), "点击领取")]/@href',
-                '//div[contains(@class, "content")]//a[contains(text(), "点击领取")]/@href',
-                '//div[@class="article-content"]//a/@href'
-            ]
-
-            for pattern in xpath_patterns:
-                links = html.xpath(pattern)
-                if links:
-                    pan_link = links[0]
-                    break
-
-            if not pan_link:
-                return "未找到网盘链接"
-
-            return pan_link
-
-        except requests.exceptions.Timeout:
-            return "请求超时"
-        except Exception as e:
-            return f"获取详情失败: {str(e)}"
+        return "正在搜索短剧, 请稍后...\n在此期间请勿搜索相同短剧操作."
 
 
 if __name__ == '__main__':
     service = SystemCommand()
     print(service.search_dj(CommandContext(
-        content="无声秘恋",
-        talker_wxid='',
-        sender_wxid=''
+        content="破晓荣光",
+        talker_wxid='52964830236@chatroom',
+        sender_wxid='F1061166944'
     )))
+
+    time.sleep(20)
