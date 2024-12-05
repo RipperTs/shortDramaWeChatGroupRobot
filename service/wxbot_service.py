@@ -20,9 +20,6 @@ class WxbotService:
         :param content:
         :return:
         """
-        if wxid == 'wxid_roq6lkoc17wp22' or SenderWxid == 'wxid_roq6lkoc17wp22':
-            content += '\n\n(Mxh你挣不到钱的，别再问了)'
-
         if SenderWxid == '':
             payload = json.dumps({
                 "wxid": wxid,
@@ -37,7 +34,6 @@ class WxbotService:
             })
 
         headers = {
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Content-Type': 'application/json'
         }
 
@@ -59,7 +55,6 @@ class WxbotService:
             "atlist": ['notify@all']
         })
         headers = {
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Content-Type': 'application/json'
         }
 
@@ -83,7 +78,6 @@ class WxbotService:
             "image": base64image
         })
         headers = {
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Content-Type': 'application/json'
         }
 
@@ -102,7 +96,6 @@ class WxbotService:
             "wxid": wxid,
         })
         headers = {
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Content-Type': 'application/json'
         }
         response = requests.request("POST", f"{self.url}/api/dbaccountbywxid", headers=headers, data=payload,
