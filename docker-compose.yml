@@ -21,5 +21,6 @@ services:
       - FEISHU_APPID=
       - FEISHU_APP_SECRET=
       - AIPANSO_CODE=3456
+      - SHENLONGIP_URL=
     volumes:
       - ./cache:/app/cache   # 将缓存目录挂载到宿主机

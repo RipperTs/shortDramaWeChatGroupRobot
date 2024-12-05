@@ -33,3 +33,5 @@ SUPER_ADMIN = os.getenv('SUPER_ADMIN').split(',')
 
 DY_TOPIC_URL = os.getenv('DY_TOPIC_URL', 'https://creator.douyin.com')
 AIPANSO_CODE = os.getenv('AIPANSO_CODE', '3456')
+
+SHENLONGIP_URL = os.getenv('SHENLONGIP_URL', '')

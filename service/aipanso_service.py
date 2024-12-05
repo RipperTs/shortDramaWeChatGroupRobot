@@ -10,6 +10,7 @@ from urllib.parse import quote
 from lxml import html
 
 from config import AIPANSO_CODE
+from service.shenlongip_service import ShenLongIPService
 
 
 class AiPanSoService:
@@ -37,6 +38,7 @@ class AiPanSoService:
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
+        self.shelongip_service = ShenLongIPService()
 
     def get_egg_cookie(self, code: str):
         """
@@ -61,7 +63,9 @@ class AiPanSoService:
 
         cookie_value = self.start_load(first_start_load_value)
         self.global_headers['Cookie'] = cookie_value
-        response = requests.request("POST", url, headers=self.global_headers, data=payload, timeout=30)
+        response = requests.request("POST", url, headers=self.global_headers, data=payload, timeout=30,
+                                    proxies=self.shelongip_service.get_ip())
+
         # 获取响应 cookie
         cookie_value = response.cookies.get_dict().get('_egg', None)
         cache.set(cache_key, cookie_value, expire=86400 * 3)
@@ -72,7 +76,8 @@ class AiPanSoService:
         第一次请求获取 start_load 参数
         :return:
         """
-        response = requests.request(method, url, headers=self.global_headers, data=payload, timeout=30)
+        response = requests.request(method, url, headers=self.global_headers, data=payload, timeout=30,
+                                    proxies=self.shelongip_service.get_ip())
         pattern = r'start_load\("([^"]+)"\)'
         match = re.search(pattern, response.text)
         if match:
@@ -105,7 +110,8 @@ class AiPanSoService:
             'Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
 
         # 获取最终网盘地址
-        response = requests.request("GET", url, headers=self.global_headers, timeout=30, allow_redirects=True)
+        response = requests.request("GET", url, headers=self.global_headers, timeout=30, allow_redirects=True,
+                                    proxies=self.shelongip_service.get_ip())
         redirected_url = response.url if response.history else None
         return redirected_url
 
@@ -177,7 +183,8 @@ class AiPanSoService:
                 print(f"解析数据失败: {e}")
                 return []
 
-        response = requests.request("GET", url, headers=self.global_headers, timeout=30)
+        response = requests.request("GET", url, headers=self.global_headers, timeout=30,
+                                    proxies=self.shelongip_service.get_ip())
         return parse_data(response.text)
 
     def search_dj(self, keyword):
