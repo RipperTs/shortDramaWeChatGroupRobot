@@ -79,7 +79,6 @@ class AiPanSoService:
         response = requests.request(method, url, headers=self.global_headers, data=payload, timeout=30,
                                     proxies=self.shelongip_service.get_ip())
 
-        print(response.text)
         pattern = r'start_load\("([^"]+)"\)'
         match = re.search(pattern, response.text)
         if match:
