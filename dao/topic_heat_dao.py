@@ -113,7 +113,7 @@ class TopicHeatDao:
                         WHERE th2.keyword = th.keyword
                         AND th2.created_at >= th.created_at
                         AND th2.heat > 0
-                        AND th.room_wxid = :room_wxid
+                        AND th2.room_wxid = :room_wxid
                     ) <= 2
                     ORDER BY th.keyword, th.created_at DESC
                 """
