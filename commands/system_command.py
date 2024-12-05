@@ -68,7 +68,7 @@ class SystemCommand:
                 # 发送消息
                 self.wxbot_service.send_text_msg(ctx.talker_wxid, content, ctx.sender_wxid)
             except Exception as e:
-                self.wxbot_service.send_text_msg(ctx.talker_wxid, f"搜索短剧出现错误: \n{e}", ctx.sender_wxid)
+                self.wxbot_service.send_text_msg(ctx.talker_wxid, f"搜索短剧出现错误: \n{e}\n\n你可以几分钟后重新尝试~", ctx.sender_wxid)
 
         thread = threading.Thread(target=do_search_handler)
         thread.daemon = True
