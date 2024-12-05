@@ -56,6 +56,17 @@ class ShenLongIPService:
         }
 
 
+    def refresh_ip(self):
+        """
+        刷新一个新的代理 ip
+        :return:
+        """
+        cache = Cache('cache')
+        cache_key = "proxy_ip"
+        cache.delete(cache_key)
+        return self.get_ip()
+
+
 if __name__ == '__main__':
     service = ShenLongIPService()
     print(service.get_ip())

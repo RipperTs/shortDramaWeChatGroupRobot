@@ -195,27 +195,44 @@ class AiPanSoService:
         :param keyword:
         :return:
         """
-        self.global_headers['Cookie'] = ''
-        self.global_headers['Referer'] = ''
-        result_list = self.get_search_result(keyword)
-        content = ""
-        for i, item in enumerate(result_list, 1):
+
+        def do_search_handler(keyword):
+            """
+            立即搜索短剧
+            :return:
+            """
+            self.global_headers['Cookie'] = ''
+            self.global_headers['Referer'] = ''
+            result_list = self.get_search_result(keyword)
+            content = ""
+            for i, item in enumerate(result_list, 1):
+                try:
+                    if i > 2:
+                        break
+                    fid = item['link'][3:]
+                    pan_url = self.get_pan_url(fid)
+                    if pan_url is None:
+                        content += f"{i}、{item['title']} - https://www.aipanso.com/{item['link']}\n\n"
+                    else:
+                        content += f"{i}、{item['title']} - {pan_url}\n\n"
+
+                except Exception as e:
+                    print(f"爱搜盘数据获取失败: {e}")
+                finally:
+                    time.sleep(1)
+
+            return content
+
+        for i in range(3):
             try:
-                if i > 2:
-                    break
-                fid = item['link'][3:]
-                pan_url = self.get_pan_url(fid)
-                if pan_url is None:
-                    content += f"{i}、{item['title']} - https://www.aipanso.com/{item['link']}\n\n"
-                else:
-                    content += f"{i}、{item['title']} - {pan_url}\n\n"
-
+                return do_search_handler(keyword)
             except Exception as e:
-                print(f"爱搜盘数据获取失败: {e}")
-            finally:
+                print(f"搜索短剧出现错误: {e}, 正在重试... {i + 1}")
+                self.shelongip_service.refresh_ip()
                 time.sleep(1)
+                continue
 
-        return content
+        return None
 
 
 if __name__ == '__main__':
