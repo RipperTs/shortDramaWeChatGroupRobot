@@ -209,7 +209,7 @@ class AiPanSoService:
             except Exception as e:
                 print(f"爱搜盘数据获取失败: {e}")
             finally:
-                time.sleep(0.5)
+                time.sleep(1)
 
         return content
 
