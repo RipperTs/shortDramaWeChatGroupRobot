@@ -1,4 +1,4 @@
-from config import SHENLONGIP_URL
+from config import SHENLONGIP_URL, IS_PROXY
 import requests
 from diskcache import Cache
 import json
@@ -17,6 +17,9 @@ class ShenLongIPService:
         获取代理ip
         :return:
         """
+        if int(IS_PROXY) == 0:
+            return None
+
         cache = Cache('cache')
         cache_key = "proxy_ip"
         cache_data = cache.get(cache_key)
