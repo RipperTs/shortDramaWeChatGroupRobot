@@ -33,7 +33,7 @@ class ShenLongIPService:
         if response_json.get('code', 0) != 200:
             return None
 
-        cache.set(cache_key, response.text, expire=60 * 3)
+        cache.set(cache_key, response.text, expire=150)
         return self._parse_proxies(response_json)
 
     def _parse_proxies(self, response_json):

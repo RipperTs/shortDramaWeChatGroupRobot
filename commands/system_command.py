@@ -57,27 +57,30 @@ class SystemCommand:
         """
 
         def do_search_handler() -> None:
-            content = self.xingyun_service.search_dj(ctx.content)
-            if content == "" or content is None:
-                content = self.aipanso_service.search_dj(ctx.content)
+            try:
+                content = self.xingyun_service.search_dj(ctx.content)
+                if content == "" or content is None:
+                    content = self.aipanso_service.search_dj(ctx.content)
 
-            if content == "" or content is None:
-                content = "未搜索到相关短剧."
+                if content == "" or content is None:
+                    content = "未搜索到相关短剧."
 
-            # 发送消息
-            self.wxbot_service.send_text_msg(ctx.talker_wxid, content, ctx.sender_wxid)
+                # 发送消息
+                self.wxbot_service.send_text_msg(ctx.talker_wxid, content, ctx.sender_wxid)
+            except Exception as e:
+                self.wxbot_service.send_text_msg(ctx.talker_wxid, f"搜索短剧出现错误: \n{e}", ctx.sender_wxid)
 
         thread = threading.Thread(target=do_search_handler)
         thread.daemon = True
         thread.start()
 
-        return "正在搜索短剧, 请稍后...\n在此期间请勿搜索相同短剧操作."
+        return "正在搜索短剧, 请稍后...\n在此期间请勿搜索相同短剧."
 
 
 if __name__ == '__main__':
     service = SystemCommand()
     print(service.search_dj(CommandContext(
-        content="破晓荣光",
+        content="无声秘恋",
         talker_wxid='52964830236@chatroom',
         sender_wxid='F1061166944'
     )))
