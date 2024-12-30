@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM registry.cn-hangzhou.aliyuncs.com/ripper/python:3.11-slim
 
 # 设置工作目录
 WORKDIR /app
