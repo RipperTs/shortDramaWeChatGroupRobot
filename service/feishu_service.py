@@ -39,13 +39,12 @@ class FeiShuService:
         cache.set('feishu_access_token', access_token, expire=7000)
         return access_token
 
-    def get_spreadsheets_values(self):
+    def get_spreadsheets_values(self, spreadsheetToken: str = "TfDHsLUWkhFMdityYuycwKudnoh",
+                                range: str = "ae2886!A2:N200"):
         """
         获取表格数据
         :return:
         """
-        spreadsheetToken = "TfDHsLUWkhFMdityYuycwKudnoh"
-        range = "ae2886!A2:N200"
         url = f"https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/{spreadsheetToken}/values/{range}?valueRenderOption=ToString&dateTimeRenderOption=FormattedString"
 
         access_token = self.get_access_token()

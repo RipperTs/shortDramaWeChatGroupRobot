@@ -1,4 +1,5 @@
 import threading
+import time
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Dict, Any
@@ -72,7 +73,7 @@ class FeiShuCommand:
             raise ValueError(f"不支持的时间格式: {date_str}")
 
         try:
-            table_data = self.feishu_service.get_spreadsheets_values()
+            table_data = self.feishu_service.get_spreadsheets_values(range="ae2886!A4:N200")
             values = table_data.get('data', {}).get('valueRange', {}).get('values', [])
             today = datetime.now().date()
 
@@ -126,15 +127,15 @@ class FeiShuCommand:
     def _extract_topic_data(item: List[str]) -> Dict[str, str]:
         """提取话题数据"""
         return {
-            'keyword': _parse_keyword(item[2].strip()),  # 话题关键词
-            'shelf_time': f"{item[0]} {item[1]}".replace('：', ':'),
-            'xt_mcn': item[3] or '',
-            'applet': item[4] or '',
-            'theater': item[6] or '',
-            'television': item[7] or '',
-            'category': item[8] or '',
-            'other': item[12] or '',
-            'gf_material_link': item[11] or ''
+            'keyword': _parse_keyword(item[3].strip()),  # 话题关键词
+            'shelf_time': f"{item[0]} {item[1]}".replace('：', ':'), # 上架时间
+            'xt_mcn': item[4] or '', # XT/MCN
+            'applet': item[5] or '', # 小程序融合
+            'theater': item[8] or '', # 剧场
+            'television': item[9] or '', # 频道
+            'category': item[10] or '', # 分类
+            'other':  '',
+            'gf_material_link': item[11] or '' # 链接
         }
 
     @staticmethod
@@ -188,3 +189,6 @@ if __name__ == '__main__':
         sender_wxid=''
     ))
     print(result)
+
+    time.sleep(60)
+
