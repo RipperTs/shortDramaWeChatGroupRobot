@@ -27,7 +27,7 @@ def getWebTopicList(keyword):
         return json.loads(cache_data)
 
     encoded_keyword = quote(keyword)
-    url = f"{DY_TOPIC_URL}/aweme/v1/search/challengesug/?source=challenge_create&aid=2906&keyword={encoded_keyword}&cookie_enabled=true&screen_width=2560&screen_height=1440&browser_language=zh-CN&browser_platform=MacIntel&browser_name=Mozilla&browser_version=5.0+%28Macintosh%3B+Intel+Mac+OS+X+10_15_7%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Chrome%2F130.0.0.0+Safari%2F537.36&browser_online=true&timezone_name=Asia%2FShanghai"
+    url = f"{DY_TOPIC_URL}/aweme/v1/search/challengesug/?source=challenge_create&aid=2906&keyword={encoded_keyword}"
     response = requests.get(url, headers={
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
     }, timeout=30)
@@ -64,7 +64,7 @@ def saveTopicHeat(room_wxid: str):
         # 解析话题热度
         view_count = parse_view_count(item.keyword, topic_list)
         TopicHeatDao.create(item.keyword, view_count, room_wxid)
-        time.sleep(1)
+        time.sleep(5)
 
     # 查询要通知的热度数据
     heat_notify_list = TopicHeatDao.get_heat_notify_list(room_wxid)
